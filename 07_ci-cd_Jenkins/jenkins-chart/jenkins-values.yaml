@@ -1,0 +1,82 @@
+controller:
+  admin:
+    username: admin
+    password: admin
+  additionalKubernetesCredentials:
+    - secretNamespace: "jenkins"
+      secretName: "jenkins-secrets"
+  serviceType: LoadBalancer
+  installPlugins:
+    - configuration-as-code:latest
+    - git:latest
+    - kubernetes:latest
+    - workflow-aggregator:latest
+    - credentials-binding:latest
+
+persistence:
+  enabled: true
+  storageClass: "gp2" 
+  size: "8Gi"  
+
+extraEnv:
+    - name: GITHUB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: jenkins-secrets
+          key: github-username
+    - name: GITHUB_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: jenkins-secrets
+          key: github-token
+    - name: DOCKERHUB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: jenkins-secrets
+          key: dockerhub-username
+    - name: DOCKERHUB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: jenkins-secrets
+          key: dockerhub-token
+JCasC:
+    enabled: true
+    configScripts:
+      setup: |
+        credentials:
+          system:
+            domainCredentials:
+            - credentials:
+              - usernamePassword:
+                  scope: GLOBAL
+                  id: "github-token"
+                  username: "${GITHUB_USERNAME}"
+                  password: "${GITHUB_TOKEN}"
+                  description: "GitHub PAT"
+              - usernamePassword:
+                  scope: GLOBAL
+                  id: "dockerhub-creds"
+                  username: "${DOCKERHUB_USERNAME}"
+                  password: "${DOCKERHUB_PASSWORD}"
+                  description: "DockerHub Credentials"
+      my-jobs: |
+        jobs:
+          - script: >
+              pipelineJob('my-test-pipeline') {
+                definition {
+                  cpsScm {
+                    scm {
+                      git {
+                        remote {
+                          url('https://github.com/chmelvv/simple_site_for_k8s_practice.git')
+                          credentials('github-token')
+                        }
+                        branch('main')
+                      }
+                    }
+                    scriptPath('Jenkinsfile')
+                  }
+                }
+              }
+
+

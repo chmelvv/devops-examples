@@ -71,7 +71,7 @@ helm status my-web-sites
 <edit values>
 helm upgrade my-web-sites ./
 helm history my-web-sites
-# helm rollback helm rollback 1
+helm rollback helm rollback 1
 helm uninstall my-web-sites
 
 helm create myChart
