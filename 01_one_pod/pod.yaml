@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: whoami-pod
+  labels:
+    app: whoami-webserver
+spec:
+  containers:
+  - name: whoami-container
+    image: traefik/whoami:v1.8.0
+    ports:
+    - containerPort: 80

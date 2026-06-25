@@ -1,0 +1,21 @@
+# Global Ingress configuration
+ingress:
+  host: my-web-server
+  ingressClassName: nginx
+
+# Array of websites to deploy dynamically
+sites:
+  - name: site-one
+    color: "#2ecc71" # Green
+    title: "Welcome to SITE ONE"
+    description: "This is the GREEN website managed via Helm variables."
+    path: /site-one
+    replicas: 1
+
+  - name: site-two
+    color: "#e74c3c" # Red
+    title: "Welcome to SITE TWO"
+    description: "This is the RED website managed via Helm variables."
+    path: /site-two
+    replicas: 1
+  

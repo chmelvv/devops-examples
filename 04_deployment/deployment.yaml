@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment        # Defines the type of resource as a Deployment
+metadata:
+  name: whoami-deployment
+  labels:
+    app: whoami-web
+spec:
+  replicas: 4           # Instructs K8s to run and maintain exactly 4 pod replicas
+  strategy:
+    type: RollingUpdate # Strategy to update application with zero downtime. Other: Recreate, Canary, Blue-Green
+    rollingUpdate:
+      maxSurge: 1       # Allows creating at most 1 pod above the desired replica count during update
+      maxUnavailable: 0 # Ensures that 100% of the replicas are available during the rollout
+  selector:
+    matchLabels:
+      app: whoami-app   # The "glue": Deployment manages pods matching this specific label
+  template:             # Blueprint template used by the Deployment to spin up new pods
+    metadata:
+      labels:
+        app: whoami-app # This label MUST perfectly match the selector above
+    spec:
+      containers:
+      - name: whoami-container
+        image: traefik/whoami:v1.10.0 
+        ports:
+        - containerPort: 80

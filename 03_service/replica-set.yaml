@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: www-replicaset
+  labels:
+    app: webserver
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: webserver
+  template:
+    metadata:
+      labels:
+        app: webserver
+    spec:
+      containers:
+      - name: whoami-container
+        image: traefik/whoami:v1.8.0
+        ports:
+        - containerPort: 80

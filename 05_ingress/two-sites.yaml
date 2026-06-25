@@ -1,0 +1,132 @@
+# ==========================================
+# SITE ONE: Apache Server with GREEN Background
+# ==========================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-site-one
+  labels:
+    app: site-one
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: site-one
+  template:
+    metadata:
+      labels:
+        app: site-one
+    spec:
+      containers:
+      - name: apache-container
+        image: httpd:2.4
+        ports:
+        - containerPort: 80
+        # Overriding the default start command to generate a customized HTML page
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "<html><body style='background-color: #2ecc71; text-align: center; color: white; font-family: sans-serif; padding-top: 100px;'><h1>Welcome to SITE ONE (Apache)</h1><p>This is the GREEN website managed by Kubernetes.</p></body></html>" > /usr/local/apache2/htdocs/index.html
+          httpd-foreground
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: site-one-service
+spec:
+  type: ClusterIP
+  selector:
+    app: site-one
+  ports:
+  - port: 80
+    targetPort: 80
+
+---
+# ==========================================
+# SITE TWO: Apache Server with RED Background
+# ==========================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-site-two
+  labels:
+    app: site-two
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: site-two
+  template:
+    metadata:
+      labels:
+        app: site-two
+    spec:
+      containers:
+      - name: apache-container
+        image: httpd:2.4
+        ports:
+        - containerPort: 80
+        # Overriding the default start command to generate a customized HTML page
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "<html><body style='background-color: #e74c3c; text-align: center; color: white; font-family: sans-serif; padding-top: 100px;'><h1>Welcome to SITE TWO (Apache)</h1><p>This is the RED website managed by Kubernetes.</p></body></html>" > /usr/local/apache2/htdocs/index.html
+          httpd-foreground
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: site-two-service
+spec:
+  type: ClusterIP
+  selector:
+    app: site-two
+  ports:
+  - port: 80
+    targetPort: 80
+
+---
+# ==========================================
+# INGRESS: Path-Based Router with URL Rewriting
+# ==========================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: multi-site-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/load-balance: "round_robin"
+          # ewma (Exponentially Weighted Moving Average)
+          # least_conn (Least Connections)
+    # CRITICAL: Automatically strips /site-one or /site-two from the path before sending to Apache
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: my-web-server
+    http:
+      paths:
+      # Routes /site-one to the Green Apache site
+      - path: /site-one(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: site-one-service
+            port:
+              number: 80
+      # Routes /site-two to the Red Apache site
+      - path: /site-two(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: site-two-service
+            port:
+              number: 80
+
+      # 3. DEFAULT RULE (Catch-all): Якщо не підійшов жоден префікс, шлемо на Site One
+      # - path: /(.*)
+      #   pathType: ImplementationSpecific
+      #   backend:
+      #     service:
+      #       name: site-one-service
+      #       port:
+      #         number: 80
