@@ -1,6 +1,6 @@
 controller:
   admin:
-    username: admin
+    username: admin 
     password: admin
   serviceType: LoadBalancer
   installPlugins:
@@ -10,6 +10,11 @@ controller:
     - workflow-aggregator:latest
     - credentials-binding:latest
     - job-dsl:latest
+
+  startupProbe:
+    failureThreshold: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
 
   containerEnv:
     - name: GITHUB_USERNAME
@@ -36,13 +41,6 @@ controller:
                   username: "${GITHUB_USERNAME}"
                   password: "${GITHUB_TOKEN}"
                   description: "GitHub PAT"
-              - imageRegistryCredentials:
-                  scope: GLOBAL
-                  id: "dockerhub-creds"
-                  description: "DockerHub Credentials from k8s secret"
-          jenkins:
-          kubernetesCredentialsProvider:
-            enabled: true
       my-jobs: |
         jobs:
           - script: >
