@@ -22,16 +22,7 @@ controller:
         secretKeyRef:
           name: jenkins-secrets
           key: github-token
-    - name: DOCKERHUB_USERNAME
-      valueFrom:
-        secretKeyRef:
-          name: jenkins-secrets
-          key: dockerhub-username
-    - name: DOCKERHUB_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: jenkins-secrets
-          key: dockerhub-token
+
   JCasC:
     configScripts:
       setup: |
@@ -45,12 +36,13 @@ controller:
                   username: "${GITHUB_USERNAME}"
                   password: "${GITHUB_TOKEN}"
                   description: "GitHub PAT"
-              - usernamePassword:
+              - imageRegistryCredentials:
                   scope: GLOBAL
                   id: "dockerhub-creds"
-                  username: "${DOCKERHUB_USERNAME}"
-                  password: "${DOCKERHUB_PASSWORD}"
-                  description: "DockerHub Credentials"
+                  description: "DockerHub Credentials from k8s secret"
+          jenkins:
+          kubernetesCredentialsProvider:
+            enabled: true
       my-jobs: |
         jobs:
           - script: >
