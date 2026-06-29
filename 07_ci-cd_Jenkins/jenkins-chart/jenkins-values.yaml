@@ -10,6 +10,7 @@ controller:
     - workflow-aggregator:latest
     - credentials-binding:latest
     - job-dsl:latest
+    - ws-cleanup:latest
 
   startupProbe:
     failureThreshold: 60
