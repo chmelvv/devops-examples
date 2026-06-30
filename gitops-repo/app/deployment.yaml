@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: myapp-container
-        image: chmelvv/myapp:v1
+        image: chmelvv/myapp:v2
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
