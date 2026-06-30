@@ -1,5 +1,4 @@
 myChart/*
-08_argocd/terraform.tfstate
-08_argocd/terraform.tfstate.backup
+08_argocd/terraform.*
 08_argocd/.terraform/*
-08_argocd/.terraform.lock.hcl
+08_argocd/.terraform.*
