@@ -51,7 +51,7 @@ controller:
                     scm {
                       git {
                         remote {
-                          url('https://github.com/chmelvv/simple_site_for_k8s_practice.git')
+                          url('https://github.com/chmelvv/static-simple-site.git')
                           credentials('github-token')
                         }
                         branch('main')
