@@ -3,6 +3,7 @@ terraform plan
 terraform apply
 
 aws eks --region eu-west-2 update-kubeconfig --name devops-eks-cluster --profile aws
+kubectl create namespace jenkins
 
 //make zero nodes to save resources
 # aws eks update-nodegroup-config \
@@ -13,7 +14,7 @@ aws eks --region eu-west-2 update-kubeconfig --name devops-eks-cluster --profile
 
 # terraform destroy -auto-approve
 
-kubectl create namespace jenkins
+
 
 # add secrets
 # Hashicorp Vault - to store secrets in enterprise
