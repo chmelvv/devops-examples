@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: myapp-servicemonitor
+  namespace: default 
+  labels:
+    release: prom-stack  # bind to  the Prometheus instance with this label
+spec:
+  selector:
+    matchLabels:
+      app: myapp 
+  namespaceSelector:
+    matchNames:
+      - default
+  endpoints:
+  - port: metrics # This is the NAME of the port from service.yaml
+    interval: 10s # Scrape interval 
+    path: /metrics # The path where nginx-prometheus-exporter exposes metrics

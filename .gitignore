@@ -2,3 +2,4 @@ myChart/*
 08_argocd/terraform.*
 08_argocd/.terraform/*
 08_argocd/.terraform.*
+09_RDS/postgresql/.terraform.*

@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: node-cpu-alerts
+  namespace: monitoring 
+  labels:
+    #  must match  Helm release name, 
+    release: prom-stack 
+spec:
+  groups:
+    - name: hardware.rules # Logical group for hardware alerts
+      rules:
+        - alert: HighNodeCpuUsage
+          # The same PromQL query used in Grafana, but with the condition "> 85"
+          expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+          
+          # Protection against false positives (alert fires only if CPU > 85% persists for 5 consecutive minutes)
+          for: 5m 
+          
+          labels:
+            severity: warning # Severity level (can also use 'critical')
+            
+          annotations:
+            # Text that will be sent to your alerting channels (Slack / Telegram / Email)
+            summary: "High CPU usage on node {{ $labels.instance }}"
+            description: "CPU usage on node {{ $labels.instance }} has exceeded 85% for more than 5 minutes. Current value: {{ $value | humanize }}%."

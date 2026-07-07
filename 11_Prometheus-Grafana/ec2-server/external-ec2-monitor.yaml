@@ -1,0 +1,48 @@
+# 1. Endpoints: This manually maps a Kubernetes resource to your EC2's IP
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: external-ec2-metrics
+  namespace: default
+  labels:
+    app: external-ec2
+subsets:
+  - addresses:
+      # REPLACE THIS with real Private IP of your EC2 instance
+      - ip: 10.0.5.150 
+    ports:
+      - name: metrics
+        port: 9100
+        protocol: TCP
+---
+# 2. Service: NO "selector" block here!
+# Because the name matches the Endpoints name above, K8s binds them automatically.
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-ec2-metrics
+  namespace: default
+  labels:
+    app: external-ec2
+spec:
+  ports:
+    - name: metrics
+      port: 9100
+      targetPort: 9100
+---
+# 3. Tells Prometheus Operator to scrape the Service we just created
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: external-ec2-monitor
+  namespace: default
+  labels:
+    # match Prometheus Operator Helm release name
+    release: prom-stack 
+spec:
+  selector:
+    matchLabels:
+      app: external-ec2
+  endpoints:
+  - port: metrics
+    interval: 15s

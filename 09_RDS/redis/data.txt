@@ -1,0 +1,32 @@
+// 1. Saving user profiles (using Hashes)
+HSET user:1 username "taras.s" email "taras@example.com" status "active"
+HSET user:2 username "olena_dev" email "olena@example.com" status "active"
+
+// 2. Shopping cart (using Sets - unique values)
+SADD cart:user:1 "Ноутбук Lenovo ThinkPad"
+SADD cart:user:1 "Бездротова миша Logitech"
+SADD cart:user:2 "Монітор Dell 27"
+
+// 3. User session with automatic expiration (TTL)
+// Setting a session token that will expire in 3600 seconds (1 hour)
+SET session:taras_token "abc123xyz" EX 3600
+
+// 4. Product rating (using Sorted Sets)
+// For example, the number of views for each product
+ZADD products:views 150 "Ноутбук Lenovo ThinkPad"
+ZADD products:views 45 "Бездротова миша Logitech"
+ZADD products:views 350 "Монітор Dell 27"
+
+// --- How to read this data later? ---
+
+// Get all data for user 1:
+HGETALL user:1
+
+// See what is in Taras's cart:
+SMEMBERS cart:user:1
+
+// Check how much time is left for the session to live (returns seconds):
+TTL session:taras_token
+
+// Top 2 most popular products (from highest to lowest):
+ZREVRANGE products:views 0 1 WITHSCORES
