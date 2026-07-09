@@ -4,7 +4,7 @@ metadata:
   name: node-cpu-alerts
   namespace: monitoring 
   labels:
-    #  must match  Helm release name, 
+    #  must match  Helm release name 
     release: prom-stack 
 spec:
   groups:
@@ -12,14 +12,10 @@ spec:
       rules:
         - alert: HighNodeCpuUsage
           # The same PromQL query used in Grafana, but with the condition "> 85"
-          expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
-          
-          # Protection against false positives (alert fires only if CPU > 85% persists for 5 consecutive minutes)
+          expr: 100 - (avg by (pod) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 4
           for: 5m 
-          
           labels:
             severity: warning # Severity level (can also use 'critical')
-            
           annotations:
             # Text that will be sent to your alerting channels (Slack / Telegram / Email)
             summary: "High CPU usage on node {{ $labels.instance }}"

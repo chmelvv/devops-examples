@@ -1,0 +1,68 @@
+controller:
+  admin:
+    username: admin 
+    password: admin
+  serviceType: LoadBalancer
+  installPlugins:
+    - configuration-as-code:latest
+    - git:latest
+    - kubernetes:latest
+    - workflow-aggregator:latest
+    - credentials-binding:latest
+    - job-dsl:latest
+    - ws-cleanup:latest
+
+  startupProbe:
+    failureThreshold: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+
+  containerEnv:
+    - name: GITHUB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: jenkins-secrets
+          key: github-username
+    - name: GITHUB_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: jenkins-secrets
+          key: github-token
+
+  JCasC:
+    configScripts:
+      setup: |
+        credentials:
+          system:
+            domainCredentials:
+            - credentials:
+              - usernamePassword:
+                  scope: GLOBAL
+                  id: "github-token"
+                  username: "${GITHUB_USERNAME}"
+                  password: "${GITHUB_TOKEN}"
+                  description: "GitHub PAT"
+      my-jobs: |
+        jobs:
+          - script: >
+              pipelineJob('my-test-pipeline') {
+                definition {
+                  cpsScm {
+                    scm {
+                      git {
+                        remote {
+                          url('https://github.com/chmelvv/my-juice-shop.git')
+                          credentials('github-token')
+                        }
+                        branch('master')
+                      }
+                    }
+                    scriptPath('Jenkinsfile')
+                  }
+                }
+              }
+
+persistence:
+  enabled: true
+  storageClass: "gp2" 
+  size: "8Gi"
