@@ -1,0 +1,23 @@
+services:
+  storage-demo:
+    build: .                          # Builds the image from the Dockerfile in the same directory
+    container_name: storage-demo
+    ports:
+      - "8080:80"
+    volumes:
+      # 1. Container Layer is not explicitly defined here; it is created automatically inside
+
+      # 2. Volumes - syntax: volume_name:path_in_container
+      - my_nginx_volume:/usr/share/my-data/volume_data
+
+      # 3. Bind Mounts - syntax: host_path:path_in_container
+      # In Docker Compose on Windows, you can use relative paths (e.g., ./bind_data)
+      - ./docker-demo-bind-data:/usr/share/my-data/bind_data
+
+    # 4. tmpfs Mounts (RAM storage)
+    tmpfs:
+      - /usr/share/my-data/tmpfs_data
+
+# It is required to declare the named volume used above
+volumes:
+  my_nginx_volume:
