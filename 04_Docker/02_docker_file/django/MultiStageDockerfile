@@ -1,0 +1,39 @@
+# ==========================================
+# ЕТАП 1: Збірка залежностей (Builder)
+# ==========================================
+FROM python:3.10-slim AS builder
+
+WORKDIR /app
+
+# Створюємо ізольоване віртуальне середовище, щоб його було легко перенести на наступний етап
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Встановлюємо бібліотеки у віртуальне середовище
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+
+# ==========================================
+# ЕТАП 2: Фінальний легковаговий образ
+# ==========================================
+FROM python:3.10-slim
+
+# Забороняємо Python створювати зайві .pyc файли та буферизувати логи
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH"
+
+WORKDIR /app
+
+# Копіюємо ТІЛЬКИ готове віртуальне середовище з першого етапу (без кешу pip та компіляторів)
+COPY --from=builder /opt/venv /opt/venv
+
+# Копіюємо код нашого проєкту
+COPY . .
+
+# Запускаємо від імені звичайного користувача (не root) для безпеки
+RUN useradd -m appuser && chown -R appuser:appuser /app
+USER appuser
+
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
