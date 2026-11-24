@@ -1,5 +1,5 @@
 run k8s cluster
-aws eks update-kubeconfig --name devops-eks-cluster --region eu-west-2 --profile aws
+aws eks update-kubeconfig --name devops-eks-cluster --region eu-north-1 --profile aws
 kubectl apply -f app/deployment.yaml -f app/service.yaml
 kubectl create namespace monitoring
 

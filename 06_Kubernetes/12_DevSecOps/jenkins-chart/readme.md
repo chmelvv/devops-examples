@@ -2,7 +2,7 @@ terraform init
 terraform plan
 terraform apply
 
-aws eks --region eu-west-2 update-kubeconfig --name devops-eks-cluster --profile aws
+aws eks --region eu-north-1 update-kubeconfig --name devops-eks-cluster --profile aws
 kubectl create namespace jenkins
 
 //make zero nodes to save resources
