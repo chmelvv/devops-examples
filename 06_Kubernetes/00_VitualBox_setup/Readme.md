@@ -2,6 +2,8 @@
 
 This Vagrant setup creates three Ubuntu VMs on a VirtualBox host-only network. Vagrant installs `containerd`, `kubeadm`, `kubelet`, and `kubectl` on every VM. You initialize the cluster and join the workers manually so the lab includes the `kubeadm` steps.
 
+Each kubelet is configured to advertise its VM's host-only IP as its Kubernetes node IP, rather than the shared VirtualBox NAT address.
+
 ## Requirements
 
 - VirtualBox and Vagrant installed on the host
@@ -31,6 +33,8 @@ The first run downloads the Ubuntu box and installs the container runtime and Ku
 ```powershell
 vagrant provision
 ```
+
+Provisioning updates the kubelet node IP on existing VMs as well. Verify the addresses with `kubectl get nodes -o wide`; the `INTERNAL-IP` values should match the host-only IPs in the table above.
 
 ## Initialize the control plane
 

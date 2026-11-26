@@ -19,7 +19,10 @@ Vagrant.configure("2") do |config|
                          host_ip: "127.0.0.1"
 
       machine.vm.provision "shell",
-                           env: { "KUBERNETES_MINOR" => kubernetes_minor },
+                           env: {
+                             "KUBERNETES_MINOR" => kubernetes_minor,
+                             "NODE_IP" => node[:ip]
+                           },
                            inline: <<~'SHELL'
         set -eu
 
@@ -64,7 +67,11 @@ Vagrant.configure("2") do |config|
         sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
         systemctl enable --now containerd
         systemctl restart containerd
+        printf 'KUBELET_EXTRA_ARGS=--node-ip=%s\n' "$NODE_IP" >/etc/default/kubelet
         systemctl enable kubelet
+        if systemctl is-active --quiet kubelet; then
+          systemctl restart kubelet
+        fi
         apt-mark hold kubelet kubeadm kubectl
       SHELL
 
