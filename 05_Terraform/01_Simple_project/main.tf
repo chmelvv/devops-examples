@@ -9,8 +9,19 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
-  region  = var.aws_region
-  profile = "default"
+  region                      = "eu-west-2"
+  access_key                  = "test"
+  secret_key                  = "test"
+  skip_credentials_validation = true
+  skip_metadata_api_check     = true
+  skip_requesting_account_id  = true
+  s3_use_path_style           = true
+
+  endpoints {
+    ec2 = "http://localhost:4566"
+    s3  = "http://localhost:4566"
+    sts = "http://localhost:4566"
+  }
 }
 
 # Fetch the default VPC in the selected region
@@ -20,13 +31,8 @@ data "aws_vpc" "default" {
 
 # Find the latest official Ubuntu 22.04 LTS AMI
 data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = ["099720109477"] # Canonical
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
-  }
+most_recent = true
+  owners      = ["amazon"]
 
   filter {
     name   = "virtualization-type"
@@ -35,8 +41,8 @@ data "aws_ami" "ubuntu" {
 }
 
 # Create a Security Group to allow inbound HTTP traffic
-resource "aws_security_group" "web_sg" {
-  name        = "${var.project_name}-sg"
+resource "aws_security_group" "web_sg2" {
+  name        = "${var.project_name}-sg2"
   description = "Allow HTTP inbound traffic"
   vpc_id      = data.aws_vpc.default.id
 
@@ -67,7 +73,7 @@ resource "aws_security_group" "web_sg" {
 resource "aws_instance" "web" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
-  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  vpc_security_group_ids = [aws_security_group.web_sg2.id]
 
   # Bootstrap script to install and start Nginx
   user_data = <<-EOF

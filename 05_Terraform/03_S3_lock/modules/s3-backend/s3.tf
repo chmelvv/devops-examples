@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "terraform_state" {
   bucket = var.bucket_name
 
   # Allow Terraform to delete the bucket even if state file versions exist (useful for labs)
-  force_destroy = true
+  force_destroy = false
 
   tags = {
     Name    = "Terraform State Bucket"
