@@ -12,7 +12,9 @@ https://github.com/kodekloudhub/certified-kubernetes-administrator-course/tree/m
 
 # 01  one pod
 (You can set shorter alias: 
-   e,g for power shell: 
+
+   e.g. for power shell: 
+   
    Set-Alias k kubectl
 )
 
