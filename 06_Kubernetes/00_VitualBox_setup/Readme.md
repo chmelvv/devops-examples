@@ -7,9 +7,12 @@ Each kubelet is configured to advertise its VM's host-only IP as its Kubernetes 
 ## Requirements
 
 - VirtualBox and Vagrant installed on the host
+- The `vagrant-vbguest` plugin (`vagrant plugin install vagrant-vbguest`)
 - Internet access from the VMs to download packages and container images
 - About 10 GB of free host RAM for the configured VMs
 - Each virtual disk has a 40 GB maximum capacity but is dynamically allocated; it grows as the guest writes data rather than reserving 40 GB up front.
+
+The plugin updates Guest Additions to match the host VirtualBox version when a VM starts. On Windows, the Vagrantfile uses `C:\Program Files\Oracle\VirtualBox\VBoxGuestAdditions.iso` by default. If VirtualBox is installed elsewhere, set `VBOX_GUEST_ADDITIONS_ISO` to the ISO path before running Vagrant.
 
 | VM | Role | Host-only IP | RAM | SSH port |
 | --- | --- | --- | ---: | ---: |

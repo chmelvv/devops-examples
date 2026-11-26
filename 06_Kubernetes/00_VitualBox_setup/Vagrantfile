@@ -1,12 +1,19 @@
 Vagrant.configure("2") do |config|
+  config.vbguest.auto_update = true
+  config.vbguest.auto_reboot = true
+  config.vbguest.iso_path = ENV.fetch(
+    "VBOX_GUEST_ADDITIONS_ISO",
+    "C:/Program Files/Oracle/VirtualBox/VBoxGuestAdditions.iso"
+  )
+  config.vbguest.no_remote = true
   config.vm.box = "ubuntu/jammy64"
   config.vm.box_check_update = false
   kubernetes_minor = ENV.fetch("KUBERNETES_MINOR", "v1.37")
 
   nodes = {
     "k8s-cp" => { ip: "192.168.56.10", cpus: 2, memory: 4096, ssh_port: 22222 },
-    "k8s-worker1" => { ip: "192.168.56.11", cpus: 2, memory: 3072, ssh_port: 22223 },
-    "k8s-worker2" => { ip: "192.168.56.12", cpus: 2, memory: 3072, ssh_port: 22224 }
+    "k8s-worker1" => { ip: "192.168.56.11", cpus: 1, memory: 3072, ssh_port: 22223 },
+    "k8s-worker2" => { ip: "192.168.56.12", cpus: 1, memory: 3072, ssh_port: 22224 }
   }
 
   nodes.each do |name, node|
@@ -63,15 +70,28 @@ Vagrant.configure("2") do |config|
         apt-get install -y containerd.io kubelet kubeadm kubectl virtualbox-guest-utils
 
         mkdir -p /etc/containerd
-        containerd config default >/etc/containerd/config.toml
-        sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
-        systemctl enable --now containerd
-        systemctl restart containerd
-        printf 'KUBELET_EXTRA_ARGS=--node-ip=%s\n' "$NODE_IP" >/etc/default/kubelet
-        systemctl enable kubelet
-        if systemctl is-active --quiet kubelet; then
-          systemctl restart kubelet
+        containerd_config=$(mktemp)
+        containerd config default >"$containerd_config"
+        sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' "$containerd_config"
+        if ! cmp -s "$containerd_config" /etc/containerd/config.toml; then
+          install -m 0644 "$containerd_config" /etc/containerd/config.toml
+          if systemctl is-active --quiet containerd; then
+            systemctl restart containerd
+          fi
         fi
+        rm -f "$containerd_config"
+        systemctl enable --now containerd
+
+        kubelet_config=$(mktemp)
+        printf 'KUBELET_EXTRA_ARGS=--node-ip=%s\n' "$NODE_IP" >"$kubelet_config"
+        if ! cmp -s "$kubelet_config" /etc/default/kubelet; then
+          install -m 0644 "$kubelet_config" /etc/default/kubelet
+          if systemctl is-active --quiet kubelet; then
+            systemctl restart kubelet
+          fi
+        fi
+        rm -f "$kubelet_config"
+        systemctl enable kubelet
         apt-mark hold kubelet kubeadm kubectl
       SHELL
 

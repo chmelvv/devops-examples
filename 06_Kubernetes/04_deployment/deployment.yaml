@@ -21,6 +21,6 @@ spec:
     spec:
       containers:
       - name: whoami-container
-        image: traefik/whoami:v1.10.0 
+        image: traefik/whoami:v1.10.0 # older version: traefik/whoami, update it to the v1.12.0
         ports:
         - containerPort: 80

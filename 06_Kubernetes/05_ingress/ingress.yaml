@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: multi-site-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/load-balance: "round_robin"
+    # /$2 передає все, що йде після /site-one/ або /site-two/
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: my-web-server
+      http:
+        paths:
+          - path: /site-one(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: site-one-service
+                port:
+                  number: 80
+          - path: /site-two(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: site-two-service
+                port:
+                  number: 80

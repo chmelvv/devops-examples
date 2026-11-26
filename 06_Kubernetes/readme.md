@@ -1,6 +1,8 @@
 * Code for k8s cluster under virtualbox
 
 https://github.com/kodekloudhub/certified-kubernetes-administrator-course/tree/master/kubeadm-clusters/virtualbox 
+https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/kubeadm-clusters/generic/04-node-setup.md 
+
 
 * VSCode + estensions:
 
@@ -10,11 +12,24 @@ https://github.com/kodekloudhub/certified-kubernetes-administrator-course/tree/m
 
 *  copy   /etc/kubernetes/admin.conf  from k8s control plane to your local machine ( ~/.kube/config) to have default config
 
+## Network addresses
+
+| Layer | Address or CIDR | Notes |
+| --- | --- | --- |
+| Windows host-only adapter | `192.168.56.1/24` | Host address on the private Vagrant network; separate from the laptop's Wi-Fi/LAN IP |
+| Control-plane node | `192.168.56.10` | Kubernetes node IP |
+| Worker 1 node | `192.168.56.11` | Kubernetes node IP |
+| Worker 2 node | `192.168.56.12` | Kubernetes node IP |
+| Pod network | `10.244.0.0/16` | Flannel network for pod addresses |
+| Example pod IP | `10.244.2.3` | `whoami-pod` on worker 2 when last observed; pod IPs can change |
+
+Use `kubectl get nodes -o wide` to see current node IPs and `kubectl get pods -A -o wide` to see current pod IPs.
+
 # 01  one pod
 (You can set shorter alias: 
 
    e.g. for power shell: 
-   
+
    Set-Alias k kubectl
 )
 
@@ -28,7 +43,9 @@ kubectl get pods
 
 kubectl get pods -o wide
 
-kubectl describe pod <name>
+For deeper pod's investifation: 
+
+   kubectl describe pod <name>
 
 kubectl get pods -A
 

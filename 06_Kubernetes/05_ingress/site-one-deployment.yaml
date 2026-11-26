@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-site-one
+  labels:
+    app: site-one
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: site-one
+  template:
+    metadata:
+      labels:
+        app: site-one
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "<html><body style='background-color: #2ecc71; text-align: center; color: white; font-family: sans-serif; padding-top: 100px;'><h1>Welcome to SITE ONE (NGINX)</h1><p>This is the GREEN website managed by Kubernetes.</p></body></html>" > /usr/share/nginx/html/index.html
+              nginx -g 'daemon off;'
