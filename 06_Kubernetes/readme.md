@@ -7,6 +7,11 @@ https://github.com/kodekloudhub/certified-kubernetes-administrator-course/tree/m
 3)  скопіювати вміст файлу /etc/kubernetes/admin.conf  з  контролер-ноди на свій локальний комп'ютер (у папку ~/.kube/config).
 
 5.  one pod
+(You can set shorter alias: 
+   e,g for power shell: 
+   Set-Alias k kubectl
+)
+
 Discover k8s:
 kubectl cluster-info
 kubectl get all
