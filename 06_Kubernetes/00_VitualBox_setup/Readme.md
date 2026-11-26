@@ -1,6 +1,6 @@
 # Kubernetes lab on VirtualBox
 
-This Vagrant setup creates three Ubuntu VMs on a VirtualBox host-only network. Vagrant installs `containerd`, `kubeadm`, `kubelet`, and `kubectl` on every VM. You initialize the cluster and join the workers manually so the lab includes the `kubeadm` steps.
+This Vagrant setup creates three Ubuntu VMs on a VirtualBox host-only network. Vagrant installs VirtualBox guest utilities, `containerd`, `kubeadm`, `kubelet`, and `kubectl` on every VM. You initialize the cluster and join the workers manually so the lab includes the `kubeadm` steps.
 
 Each kubelet is configured to advertise its VM's host-only IP as its Kubernetes node IP, rather than the shared VirtualBox NAT address.
 

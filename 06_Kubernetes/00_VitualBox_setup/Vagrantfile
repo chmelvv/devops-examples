@@ -60,7 +60,7 @@ Vagrant.configure("2") do |config|
           >/etc/apt/sources.list.d/kubernetes.list
 
         apt-get update
-        apt-get install -y containerd.io kubelet kubeadm kubectl
+        apt-get install -y containerd.io kubelet kubeadm kubectl virtualbox-guest-utils
 
         mkdir -p /etc/containerd
         containerd config default >/etc/containerd/config.toml
