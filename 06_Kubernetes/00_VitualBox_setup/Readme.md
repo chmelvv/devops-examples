@@ -7,6 +7,7 @@ This Vagrant setup creates three Ubuntu VMs on a VirtualBox host-only network. V
 - VirtualBox and Vagrant installed on the host
 - Internet access from the VMs to download packages and container images
 - About 10 GB of free host RAM for the configured VMs
+- Each virtual disk has a 40 GB maximum capacity but is dynamically allocated; it grows as the guest writes data rather than reserving 40 GB up front.
 
 | VM | Role | Host-only IP | RAM | SSH port |
 | --- | --- | --- | ---: | ---: |
